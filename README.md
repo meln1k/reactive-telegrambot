@@ -1,7 +1,7 @@
 # Reactive Telegram Bot API
 
 [Reactive Streams](http://www.reactive-streams.org) wrapper
-for [Telegram Bots API](https://core.telegram.org/bots) written in Scala.
+for [Telegram Bots API](https://core.telegram.org/bots) written in Scala with Akka Streams.
 
 
 Dependencies
