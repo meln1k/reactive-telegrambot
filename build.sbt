@@ -2,7 +2,7 @@ organization := "com.github.meln1k"
 
 name := """reactive-telegrambot"""
 
-version := "1.1"
+version := "1.1.1"
 
 scalaVersion := "2.11.6"
 
