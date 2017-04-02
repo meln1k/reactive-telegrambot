@@ -9,12 +9,13 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
-import akka.stream.scaladsl.{Keep, Sink, Source, Flow}
+import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import com.github.meln1k.reactive.telegrambot.models._
 import TelegramBotJsonProtocol._
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import spray.json._
 import ApiHelper._
+import akka.NotUsed
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
@@ -62,7 +63,7 @@ class TelegramRequestConsumer(private val token: String)(implicit actorSystem: A
     Marshal(formData).to[RequestEntity]
   }
 
-  private val apiRequestToHttpRequest: Flow[ApiRequest, (HttpRequest, UUID), Unit] =
+  private val apiRequestToHttpRequest: Flow[ApiRequest, (HttpRequest, UUID), NotUsed] =
     Flow[ApiRequest].mapAsyncUnordered(4) { case ApiRequest(method, id) =>
       val filteredParams = method.allParams.filterNot(_._2 == None).map {
         case (name, Some(value)) => name -> value
@@ -78,7 +79,7 @@ class TelegramRequestConsumer(private val token: String)(implicit actorSystem: A
   private val http = Http().superPool[UUID]()
 
 
-  private val httpResponseToApiResponse: Flow[(Try[HttpResponse], UUID), ApiResponse, Unit] =
+  private val httpResponseToApiResponse: Flow[(Try[HttpResponse], UUID), ApiResponse, NotUsed] =
     Flow[(Try[HttpResponse], UUID)]
       .mapAsync(availableProcessors) { case (tryResponse, id) =>
       tryResponse.map { response =>
@@ -90,7 +91,7 @@ class TelegramRequestConsumer(private val token: String)(implicit actorSystem: A
       }.get
     }
 
-  private val apiFlow: Flow[ApiRequest, ApiResponse, Unit] =
+  private val apiFlow: Flow[ApiRequest, ApiResponse, NotUsed] =
     Flow[ApiRequest]
       .via(apiRequestToHttpRequest)
       .via(http)
@@ -102,7 +103,7 @@ class TelegramRequestConsumer(private val token: String)(implicit actorSystem: A
       .toMat(Sink.head)(Keep.right)
       .run()
 
-  def flow: Flow[ApiRequest, ApiResponse, Unit] = apiFlow
+  def flow: Flow[ApiRequest, ApiResponse, NotUsed] = apiFlow
 
   def processor = apiFlow.toProcessor.run()
 

@@ -8,16 +8,16 @@ import akka.http.scaladsl.model.Uri.Query
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.stream.actor.ActorPublisher
-import akka.stream.scaladsl.ImplicitMaterializer
 import com.github.meln1k.reactive.telegrambot.models._
+
 import scala.annotation.tailrec
 import ApiHelper._
 import akka.pattern.pipe
+import akka.stream.ActorMaterializer
 
 private [api] class UpdateReceiver(token: String)
   extends FSM[UpdateReceiver.State, UpdateReceiver.Data]
   with ActorPublisher[Message]
-  with ImplicitMaterializer
   with ActorLogging {
 
   import akka.stream.actor.ActorPublisherMessage._
@@ -27,6 +27,8 @@ private [api] class UpdateReceiver(token: String)
   import TelegramBotJsonProtocol._
 
   implicit val system = context.system
+
+  implicit val materializer = ActorMaterializer()
 
   import context.dispatcher
 
