@@ -12,9 +12,9 @@ add the following lines to your build.sbt file:
 ```Scala
 resolvers += "nmelkozerov at bintray" at "http://dl.bintray.com/nmelkozerov/maven"
 
-libraryDependencies += "com.github.meln1k" %% "reactive-telegrambot" % "1.0"
+libraryDependencies += "com.github.meln1k" %% "reactive-telegrambot" % "1.1"
 ```
-This version of `reactive-telegrambot` depends on Scala 2.11.6.
+This version of `reactive-telegrambot` depends on Scala 2.11.7.
 
 Example usage
 -------------
